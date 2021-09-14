@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "url.usuario",
+    "type": "java.lang.String",
+    "description": "A description for 'url.usuario'"
+  },
+  {
+    "name": "vs",
+    "type": "java.lang.String",
+    "description": "A description for 'vs'"
+  },
+  {
+    "name": "au",
+    "type": "java.lang.String",
+    "description": "A description for 'au'"
+  }
+]}

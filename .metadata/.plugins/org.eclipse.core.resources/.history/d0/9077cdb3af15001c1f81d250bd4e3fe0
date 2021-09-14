@@ -1,0 +1,5 @@
+package com.glamour.restapi.exception;
+
+public class GlobalExceptionHandler {
+
+}

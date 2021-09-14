@@ -1,0 +1,26 @@
+package com.glamour.restapi.model;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "usuarios")
+public class Usuario {
+	
+	
+
+}
+
+
+/*
+ * 
+ * "{
+  ""cliente"":{
+    ""nombre"":""String"",
+    ""apellidoPaterno"":""String"",
+    ""apellidoMaterno"":""String"",
+    ""nombreUsuario"":""String"",
+    ""correoEletronico"":""String"",
+    ""contrasenia"":""String""
+  }
+ }"
+ * 
+ */

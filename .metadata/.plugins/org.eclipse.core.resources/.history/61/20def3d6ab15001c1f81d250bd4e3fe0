@@ -1,0 +1,6 @@
+
+
+au=authentication
+vs=v1
+
+url.usuario=${au}/${vs}

@@ -1,0 +1,8 @@
+
+
+
+vs=v1
+us=usuarios
+
+
+url.user=${vs}/${us}
