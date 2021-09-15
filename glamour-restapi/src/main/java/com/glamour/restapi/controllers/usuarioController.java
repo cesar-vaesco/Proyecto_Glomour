@@ -1,17 +1,17 @@
 package com.glamour.restapi.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.websocket.server.PathParam;
-
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +23,8 @@ import com.glamour.restapi.repository.UsuariosRepository;
 @RequestMapping("${url.usuario}")
 public class usuarioController {
 
+	private static final Logger log = LoggerFactory.getLogger(usuarioController.class);
+
 	@Autowired
 	private UsuariosRepository usuariosRepository;
 
@@ -32,20 +34,28 @@ public class usuarioController {
 		return usuariosRepository.findAll();
 	}
 
+	/* http://localhost:8080/authentication/v1/usuarios/usuarioId */
 	@GetMapping("/usuarios/{id}")
 	public ResponseEntity<Usuario> listarUsuariosPorId(@PathVariable(value = "id") String usuarioId)
 			throws ResourceNotFoundException {
+		ObjectId objId = new ObjectId(usuarioId);
 		Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(
-				() -> new ResourceNotFoundException("No se ha encontrado el usuario con el id:: " + usuarioId));
+				() -> new ResourceNotFoundException("No se ha encontrado el usuario con el id:: " + objId));
 		return ResponseEntity.ok(usuario);
 	}
-}
 
-/*
- * @GetMapping("/employees/{id}") public ResponseEntity < Employee >
- * getEmployeeById(@PathVariable(value = "id") Long employeeId) throws
- * ResourceNotFoundException { Employee employee =
- * employeeRepository.findById(employeeId) .orElseThrow(() - > new
- * ResourceNotFoundException("Employee not found for this id :: " +
- * employeeId)); return ResponseEntity.ok().body(employee); }
- */
+	@PostMapping("/registro-usuario")
+	public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) throws ResourceNotFoundException {
+
+		try {
+			Usuario nuevoUsuario = usuariosRepository.save(usuario);
+
+			return new ResponseEntity<Usuario>(nuevoUsuario, HttpStatus.CREATED);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+}

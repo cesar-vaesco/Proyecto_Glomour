@@ -1,0 +1,10 @@
+
+spring.data.mongodb.port=27017
+
+au=authentication
+vs=v1
+url.usuario=${au}/${vs}
+
+
+# Salida a consola.
+logging.pattern.console= %d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n

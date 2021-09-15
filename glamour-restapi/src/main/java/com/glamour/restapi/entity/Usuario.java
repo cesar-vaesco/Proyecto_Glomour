@@ -1,6 +1,9 @@
 package com.glamour.restapi.entity;
 
 
+
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,36 +12,39 @@ public class Usuario {
 
 	/* Identificador único */
 	@Id
-    private long id;
+	private String _id;
 
 	private String nombre;
 	private String apellidoPaterno;
 	private String apellidoMaterno;
 	private String nombreUsuario;
-	private String correoEletronico;
+	
+	private String email;
 	private String contrasenia;
 
 	public Usuario() {
 	}
 
-	public Usuario(long _id, String nombre, String apellidoPaterno, String apellidoMaterno, String nombreUsuario,
-			String correoEletronico, String contrasenia) {
+
+	public Usuario(String _id, String nombre, String apellidoPaterno, String apellidoMaterno, String nombreUsuario,
+			String email, String contrasenia) {
 		super();
-		this.id = _id;
+		this._id = _id;
 		this.nombre = nombre;
 		this.apellidoPaterno = apellidoPaterno;
 		this.apellidoMaterno = apellidoMaterno;
 		this.nombreUsuario = nombreUsuario;
-		this.correoEletronico = correoEletronico;
+		this.email = email;
 		this.contrasenia = contrasenia;
 	}
 
-	public long get_id() {
-		return id;
+
+	public String get_id() {
+		return _id;
 	}
 
-	public void set_id(long _id) {
-		this.id = _id;
+	public void set_id(String _id) {
+		this._id = _id;
 	}
 
 	public String getNombre() {
@@ -73,12 +79,12 @@ public class Usuario {
 		this.nombreUsuario = nombreUsuario;
 	}
 
-	public String getCorreoEletronico() {
-		return correoEletronico;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setCorreoEletronico(String correoEletronico) {
-		this.correoEletronico = correoEletronico;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getContrasenia() {
@@ -89,4 +95,6 @@ public class Usuario {
 		this.contrasenia = contrasenia;
 	}
 
+	
+	
 }

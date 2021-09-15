@@ -1,2 +1,3 @@
 1631656076790	Rename package 'com.glamour.restapi.model'
 1631656797989	Rename package 'com.glamour.restapi.usuarioController'
+1631744246525	Encapsulate field 'email'
