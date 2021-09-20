@@ -3,14 +3,13 @@ package com.glamour.restapi.controllers;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.ConstraintViolationException;
 
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import com.glamour.restapi.entity.Usuario;
 import com.glamour.restapi.exception.ResourceNotFoundException;
@@ -40,9 +39,9 @@ public class usuarioController {
 		return new ResponseEntity<>(listarUsuarios, listarUsuarios.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
-	/* http://localhost:8080/authentication/v1/usuarios/usuarioId */
+	/* http://localhost:8080/authentication/v1/usuarios/{usuarioId} */
 	@GetMapping("/usuarios/{id}")
-	public ResponseEntity<?> listarUsuariosPorId(@PathVariable(value = "id") String usuarioId) {
+	public ResponseEntity<?> listarUsuariosPorId(@PathVariable("id") String usuarioId) {
 
 		Optional<Usuario> usuarioDB = usuariosRepository.findById(usuarioId);
 
@@ -51,8 +50,6 @@ public class usuarioController {
 			if (usuarioDB.isPresent()) {
 				return new ResponseEntity<>(usuarioDB, HttpStatus.OK);
 			} else {
-				// return new ResponseEntity<>("El usuario con el id " + usuarioId + " no
-				// existe", HttpStatus.NO_CONTENT);
 				return ResponseEntity.status(204).body("El usuario con el id " + usuarioId + " no existe");
 			}
 
@@ -77,17 +74,41 @@ public class usuarioController {
 
 	}
 
-	@PutMapping("/actualizar-registro/{id}")
-	public ResponseEntity<?> actualizarRegistro(@PathVariable("id") String id, @RequestBody Usuario usuario) throws ResourceNotFoundException{
+	/* http://localhost:8080/authentication/v1/actualizar-registro/{id} */
+	@PutMapping("/actualizar-usuario/{id}")
+	public ResponseEntity<?> actualizarUsuario(@PathVariable("id") String usuarioId, @RequestBody Usuario usuario) {
 
 		try {
 			usuariosRepository.save(usuario);
-			return new ResponseEntity<>("El registro del usuario '"+ usuario.getNombreUsuario()+"' a sido actualizado", HttpStatus.OK);
-		} catch (ConstraintViolationException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-		} catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+			return new ResponseEntity<>(
+					"El registro del usuario '" + usuario.getNombreUsuario() + "' a sido actualizado", HttpStatus.OK);
+		}  catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
+
+	@DeleteMapping("/eliminar-usuario/{id}")
+	public ResponseEntity<?> eliminarUsuario(@PathVariable("id") String usuarioId) {
+
+		Optional<Usuario> usuariodb = usuariosRepository.findById(usuarioId);
+		log.info(usuarioId);
+		log.info("usuariodb " + usuariodb);
+		try {
+			if (usuariodb.isEmpty()) {
+				return new ResponseEntity<>("No existe un registro con el id'" + usuarioId + "'",
+						HttpStatus.NO_CONTENT);
+			} else if (usuariodb.isPresent()) {
+				usuariosRepository.deleteById(usuarioId);
+				return new ResponseEntity<>("El registro con el id '" + usuarioId + "' ha sido eliminado",
+						HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		return null;
+
+	}
+
+	/**/
 
 }
