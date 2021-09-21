@@ -2,7 +2,6 @@ package com.glamour.restapi.entity;
 
 
 
-import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -93,6 +92,13 @@ public class Usuario {
 
 	public void setContrasenia(String contrasenia) {
 		this.contrasenia = contrasenia;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Usuario [_id=" + _id + ", nombre=" + nombre + ", nombreUsuario=" + nombreUsuario + ", email=" + email
+				+ "]";
 	}
 
 	

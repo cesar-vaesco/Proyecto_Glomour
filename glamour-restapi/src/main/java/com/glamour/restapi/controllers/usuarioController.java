@@ -3,7 +3,7 @@ package com.glamour.restapi.controllers;
 import java.util.List;
 import java.util.Optional;
 
-
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.glamour.restapi.bussines.UsuarioDTO;
 import com.glamour.restapi.entity.Usuario;
 import com.glamour.restapi.exception.ResourceNotFoundException;
 import com.glamour.restapi.repository.UsuariosRepository;
+import com.glamour.restapi.service.UsuarioService;
 
 @RestController
 @RequestMapping("${url.usuario}")
@@ -32,9 +33,18 @@ public class usuarioController {
 	@Autowired
 	private UsuariosRepository usuariosRepository;
 
+	@Autowired
+	private UsuarioService usuarioService;
+
 	/* http://localhost:8080/authentication/v1/usuarios */
 	@GetMapping("/usuarios")
 	public ResponseEntity<?> listarUsuarios() {
+		List<UsuarioDTO> listarUsuarios = usuarioService.listarUsuarios();
+		return new ResponseEntity<>(listarUsuarios, listarUsuarios.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+	
+	@GetMapping("/usuarios-admin")
+	public ResponseEntity<?> listarUsuariosAdministrador() {
 		List<Usuario> listarUsuarios = usuariosRepository.findAll();
 		return new ResponseEntity<>(listarUsuarios, listarUsuarios.size() > 0 ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
@@ -43,18 +53,17 @@ public class usuarioController {
 	@GetMapping("/usuarios/{id}")
 	public ResponseEntity<?> listarUsuariosPorId(@PathVariable("id") String usuarioId) {
 
-		Optional<Usuario> usuarioDB = usuariosRepository.findById(usuarioId);
-
 		try {
-
-			if (usuarioDB.isPresent()) {
-				return new ResponseEntity<>(usuarioDB, HttpStatus.OK);
+			List<UsuarioDTO> usuarioDB = usuarioService.listarUsuarioPorId(usuarioId);
+			if (!usuarioDB.isEmpty()) {
+				return ResponseEntity.ok(usuarioDB);
 			} else {
-				return ResponseEntity.status(204).body("El usuario con el id " + usuarioId + " no existe");
+				return new ResponseEntity<>("El usuario con el id '" + usuarioId + "' no contiene registro",
+						HttpStatus.NOT_FOUND);
 			}
 
 		} catch (RuntimeException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -82,7 +91,7 @@ public class usuarioController {
 			usuariosRepository.save(usuario);
 			return new ResponseEntity<>(
 					"El registro del usuario '" + usuario.getNombreUsuario() + "' a sido actualizado", HttpStatus.OK);
-		}  catch (Exception e) {
+		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
@@ -95,8 +104,7 @@ public class usuarioController {
 		log.info("usuariodb " + usuariodb);
 		try {
 			if (usuariodb.isEmpty()) {
-				return new ResponseEntity<>("No existe un registro con el id'" + usuarioId + "'",
-						HttpStatus.NO_CONTENT);
+				return new ResponseEntity<>("El usuario con el id " + usuarioId + " no existe", HttpStatus.NOT_FOUND);
 			} else if (usuariodb.isPresent()) {
 				usuariosRepository.deleteById(usuarioId);
 				return new ResponseEntity<>("El registro con el id '" + usuarioId + "' ha sido eliminado",
