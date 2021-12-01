@@ -3,7 +3,8 @@ package com.glamour.restapi.controllers;
 import java.util.List;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.glamour.restapi.bussines.UsuarioDTO;
 import com.glamour.restapi.entity.Usuario;
 import com.glamour.restapi.exception.ResourceNotFoundException;
+import com.glamour.restapi.exception.UserValidException;
 import com.glamour.restapi.repository.UsuariosRepository;
+import com.glamour.restapi.service.IUsuarioService;
 import com.glamour.restapi.service.UsuarioService;
 
 @RestController
@@ -35,6 +38,9 @@ public class usuarioController {
 
 	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Autowired
+	private IUsuarioService iUsuarioService;
 
 	/* http://localhost:8080/authentication/v1/usuarios */
 	@GetMapping("/usuarios")
@@ -70,16 +76,21 @@ public class usuarioController {
 
 	/* http://localhost:8080/authentication/v1/registro-usuario */
 	@PostMapping("/registro-usuario")
-	public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) throws ResourceNotFoundException {
+	public ResponseEntity<?> crearUsuario(@Valid @RequestBody Usuario usuario)  {
 
 		try {
-			Usuario nuevoUsuario = usuariosRepository.save(usuario);
+			//Usuario nuevoUsuario = usuariosRepository.save(usuario);
+			Usuario nuevoUsuario = iUsuarioService.save(usuario);
 			return new ResponseEntity<>("El usuario " + nuevoUsuario.getNombreUsuario() + " ha sido creado",
 					HttpStatus.CREATED);
 
+		} catch (UserValidException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
 
 	}
 
@@ -109,6 +120,28 @@ public class usuarioController {
 				usuariosRepository.deleteById(usuarioId);
 				return new ResponseEntity<>("El registro con el id '" + usuarioId + "' ha sido eliminado",
 						HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		return null;
+
+	}
+	
+	
+	@DeleteMapping("/eliminar-usuarios")
+	public ResponseEntity<?> eliminarUsuarios() {
+
+		List<Usuario> usuariosdb = usuariosRepository.findAll();
+		log.info("Usuarios: " + usuariosdb);
+		
+		
+		try {
+			if (usuariosdb.isEmpty()) {
+				return new ResponseEntity<>("No existen usuarios en la base de datos", HttpStatus.NOT_FOUND);
+			} else if (usuariosdb.size() > 0) {
+				usuariosRepository.deleteAll();
+				return new ResponseEntity<>("Se han eliminado todos los registros",HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

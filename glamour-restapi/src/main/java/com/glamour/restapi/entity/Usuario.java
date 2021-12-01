@@ -3,6 +3,10 @@ package com.glamour.restapi.entity;
 
 
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +21,7 @@ public class Usuario {
 	private String apellidoPaterno;
 	private String apellidoMaterno;
 	private String nombreUsuario;
+	
 	
 	private String email;
 	private String contrasenia;
